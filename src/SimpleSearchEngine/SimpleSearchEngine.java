@@ -6,7 +6,6 @@ import javafx.util.*;
 public class SimpleSearchEngine {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		SimpleSearchEngine search = new SimpleSearchEngine();
 		
 		ArrayList<String> results = search.runSearchEngine();
@@ -14,7 +13,14 @@ public class SimpleSearchEngine {
 
 	}
 	
+	/**
+	   * Main method for the class. Initializes corpus, builds index, requests a search value, finds the indexed values, and puts together the results.
+	   * 
+	   * @return results from the search 
+	   * @throws NullPointerException if no documents contains the words searched for
+	   */
 	private ArrayList<String> runSearchEngine(){
+		
 		ArrayList<String> basicCorpus = createCorpus();
 		ArrayList<ArrayList<String>> corpus = initializeCorpus(basicCorpus);
 		
@@ -44,17 +50,12 @@ public class SimpleSearchEngine {
 		return results;
 		
 	}
-	
-	private ArrayList<ArrayList<String>> initializeCorpus(ArrayList<String> basicCorpus){
-		ArrayList<ArrayList<String>> corpus = new ArrayList<ArrayList<String>>();
-		
-		for (int i = 0; i < basicCorpus.size(); i++){
-			corpus.add(initializeDocument(basicCorpus.get(i)));
-		}
-		
-		return corpus;
-	}
-	
+
+	/**
+	   * The initial creation of the corpus. Define the documents in the form of strings here.
+	   * 
+	   * @return the corpus made of documents in the form of long strings
+	   */
 	private ArrayList<String> createCorpus(){
 		ArrayList<String> originalCorpus = new ArrayList<String>();
 		
@@ -65,7 +66,29 @@ public class SimpleSearchEngine {
 		return originalCorpus;
 	}
 	
-	private ArrayList<String> initializeDocument(String document){
+	/**
+	   * Transforms the documents in the corpus from long strings to lists of words in the document.
+	   * 
+	   * @param basicCorpus the corpus made of documents in the form of long strings
+	   * @return the corpus made of documents in the form of a list of strings
+	   */
+	private ArrayList<ArrayList<String>> initializeCorpus(ArrayList<String> basicCorpus){
+		ArrayList<ArrayList<String>> corpus = new ArrayList<ArrayList<String>>();
+		
+		for (int i = 0; i < basicCorpus.size(); i++){
+			corpus.add(stringToList(basicCorpus.get(i)));
+		}
+		
+		return corpus;
+	}
+	
+	/**
+	   * Transforms a single string into a list of its words divided by spaces.
+	   * 
+	   * @param document the string to be divided
+	   * @return the string split up and put into a list of strings
+	   */
+	private ArrayList<String> stringToList(String document){
 
 		
 		ArrayList<String> newDocument = new ArrayList<String>();
@@ -79,6 +102,12 @@ public class SimpleSearchEngine {
 		
 	}
 	
+	/**
+	   * Creates an inverse index by going through all documents in the corpus. Adds a new document to the index only if the document is not added already.
+	   * 
+	   * @param corpus the corpus to be indexed
+	   * @return the index as a map with each word mapped to a list of all the documents that contain it
+	   */
 	private Map<String, ArrayList<Integer>> createIndex(ArrayList<ArrayList<String>> corpus){
 		Map<String, ArrayList<Integer>> index = new HashMap<>();
 		
@@ -103,6 +132,11 @@ public class SimpleSearchEngine {
 		
 	}
 
+	/**
+	   * Asks the user to put in a word to be searched for.
+	   * 
+	   * @return the string the user put in
+	   */
 	private String requestSearchValue(){
 		Scanner s = new Scanner(System.in);
 		System.out.println("Enter your search value:");
@@ -111,6 +145,14 @@ public class SimpleSearchEngine {
 		return searchValue;
 	}
 
+	/**
+	   * Sorts the documents by TF-IDF. First finds the common IDF for all relevant documents, and then calculates TF-value per document. Finally sorts and puts the result in a list of integers.
+	   * 
+	   * @param documents a list of the documents to be sorted, defined by their index in the corpus
+	   * @param corpus the corpus containing all the documents, saved as lists of strings
+	   * @param word the word the list is supposed to be TF-IDF sorted by.
+	   * @return a list of documents defined by their index in the corpus, but sorted
+	   */
 	private ArrayList<Integer> sortDocuments(ArrayList<Integer> documents, ArrayList<ArrayList<String>> corpus, String word){
 		ArrayList<Integer> sortedDocuments = new ArrayList<Integer>();
 		ArrayList<Pair<Integer, Double>> tfidfValues = new ArrayList<Pair<Integer, Double>>();
@@ -122,7 +164,7 @@ public class SimpleSearchEngine {
 			tfidfValues.add(new Pair<Integer, Double>(i, tfValue*idfValue));
 		}
 		
-		tfidfValues = sortedValues(tfidfValues);
+		tfidfValues = sortIndexes(tfidfValues);
 		
 		for(Pair<Integer, Double> pair:tfidfValues){
 			sortedDocuments.add(pair.getKey());
@@ -131,19 +173,39 @@ public class SimpleSearchEngine {
 		return sortedDocuments;
 	}
 	
+	/**
+	   * Finds the term frequency of a word in a document.
+	   * 
+	   * @param document the document to be searched
+	   * @param word the word to be searched for
+	   * @return the value of term frequency
+	   */
 	private double findTf(ArrayList<String> document, String word){
 		int occurences = Collections.frequency(document, word);
 		return Double.valueOf(occurences)/Double.valueOf(document.size());
 	}
 	
+	/**
+	   * Finds the inverse document frequency of a word in a corpus.
+	   * 
+	   * @param documents the document that contain the word
+	   * @param corpus the corpus to be searched
+	   * @return the value of inverse document frequency
+	   */
 	private double findIdf(ArrayList<Integer> documents, ArrayList<ArrayList<String>> corpus){
 		double idf = Math.log(Double.valueOf(corpus.size()+1)/Double.valueOf(documents.size()+1)); //Adds 1 to both numerator and denominator to avoid division by zero and also get accurate results.
 		return idf;
 	}
 	
-	private ArrayList<Pair<Integer, Double>> sortedValues(ArrayList<Pair<Integer, Double>> tfidfValues){
+	/**
+	   * Sorts the indexes of documents based on connected values of those indexes.
+	   * 
+	   * @param pairedIndexValues the list of indexes to be sorted, paired with the values connected to the index.
+	   * @return the sorted list
+	   */
+	private ArrayList<Pair<Integer, Double>> sortIndexes(ArrayList<Pair<Integer, Double>> pairedIndexValues){
 		
-		tfidfValues.sort(new Comparator<Pair<Integer, Double>>() {
+		pairedIndexValues.sort(new Comparator<Pair<Integer, Double>>() {
 	        @Override
 	        public int compare(Pair<Integer, Double> o1, Pair<Integer, Double> o2) {
 	            if (o1.getValue() > o2.getValue()) {
@@ -156,7 +218,7 @@ public class SimpleSearchEngine {
 	        }
 	    });
 		
-		return tfidfValues;
+		return pairedIndexValues;
 	}
 
 }
