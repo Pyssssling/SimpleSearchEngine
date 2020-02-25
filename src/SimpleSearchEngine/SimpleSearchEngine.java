@@ -20,10 +20,11 @@ public class SimpleSearchEngine {
 	   */
 	private ArrayList<String> runSearchEngine(){
 		
+		TfIdfSorter sorter = new TfIdfSorter();
+		ArrayList<String> results = new ArrayList<String>();
+		
 		ArrayList<String> basicCorpus = createCorpus();
 		ArrayList<ArrayList<String>> corpus = convertCorpus(basicCorpus);
-		
-		ArrayList<String> results = new ArrayList<String>();
 		
 		Map<String, ArrayList<Integer>> index = createIndex(corpus);
 		
@@ -31,11 +32,7 @@ public class SimpleSearchEngine {
 		
 		ArrayList<Integer> foundDocuments = index.get(searchValue);
 		
-		TfIdfSorter sorter = new TfIdfSorter();
-		
 		try{
-			//System.out.println("The following documents contains " + searchValue + ": " + foundDocuments);
-		
 			if (foundDocuments.size()>1){
 				foundDocuments = sorter.sortDocuments(foundDocuments, corpus, searchValue);
 				for(int documentIndex:foundDocuments){
