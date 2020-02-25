@@ -21,7 +21,7 @@ public class SimpleSearchEngine {
 	private ArrayList<String> runSearchEngine(){
 		
 		TfIdfSorter sorter = new TfIdfSorter();
-		ArrayList<String> results = new ArrayList<String>();
+		ArrayList<String> results = new ArrayList<>();
 		
 		ArrayList<String> basicCorpus = createCorpus();
 		ArrayList<ArrayList<String>> corpus = convertCorpus(basicCorpus);
@@ -32,7 +32,7 @@ public class SimpleSearchEngine {
 		
 		ArrayList<Integer> foundDocuments = index.get(searchValue);
 		
-		try{
+		if(foundDocuments instanceof ArrayList){
 			if (foundDocuments.size()>1){
 				foundDocuments = sorter.sortDocuments(foundDocuments, corpus, searchValue);
 				for(int documentIndex:foundDocuments){
@@ -42,7 +42,7 @@ public class SimpleSearchEngine {
 			} else if(foundDocuments.size() == 1){
 				results.add(basicCorpus.get(foundDocuments.get(0)));
 			}
-		} catch(NullPointerException e){
+		} else {
 			System.out.println("No documents found with the word " + searchValue + ".");
 		}
 		return results;
@@ -55,7 +55,7 @@ public class SimpleSearchEngine {
 	   * @return the corpus made of documents in the form of long strings
 	   */
 	private ArrayList<String> createCorpus(){
-		ArrayList<String> originalCorpus = new ArrayList<String>();
+		ArrayList<String> originalCorpus = new ArrayList<>();
 		
 		originalCorpus.add("the brown fox jumped over the brown dog");
 		originalCorpus.add("the lazy brown dog sat in the corner");
@@ -71,7 +71,7 @@ public class SimpleSearchEngine {
 	   * @return the corpus made of documents in the form of a list of strings
 	   */
 	private ArrayList<ArrayList<String>> convertCorpus(ArrayList<String> basicCorpus){
-		ArrayList<ArrayList<String>> corpus = new ArrayList<ArrayList<String>>();
+		ArrayList<ArrayList<String>> corpus = new ArrayList<>();
 		
 		for (String document : basicCorpus){
 			corpus.add(stringToList(document));
@@ -88,15 +88,9 @@ public class SimpleSearchEngine {
 	   */
 	private ArrayList<String> stringToList(String document){
 
-		
-		ArrayList<String> newDocument = new ArrayList<String>();
 		String[] splitted = document.split(" ");
 		
-		for(String s:splitted){
-			newDocument.add(s);
-		}
-		
-		return newDocument;
+		return new ArrayList<>(Arrays.asList(splitted));
 		
 	}
 	
@@ -112,7 +106,7 @@ public class SimpleSearchEngine {
 		for(ArrayList<String> document:corpus){
 			for(String word:document){
 				if(!index.containsKey(word)){
-					index.put(word, new ArrayList<Integer>(Arrays.asList(corpus.indexOf(document))));
+					index.put(word, new ArrayList<>(Arrays.asList(corpus.indexOf(document))));
 				} else{
 					index = addAdditionalIndex(index, word, corpus.indexOf(document));
 				}

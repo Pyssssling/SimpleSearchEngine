@@ -14,8 +14,8 @@ public class TfIdfSorter {
 	   * @return a list of documents defined by their index in the corpus, but sorted
 	   */
 	public ArrayList<Integer> sortDocuments(ArrayList<Integer> documents, ArrayList<ArrayList<String>> corpus, String word){
-		ArrayList<Integer> sortedDocuments = new ArrayList<Integer>();
-		ArrayList<Pair<Integer, Double>> tfidfValues = new ArrayList<Pair<Integer, Double>>();
+		ArrayList<Integer> sortedDocuments = new ArrayList<>();
+		ArrayList<Pair<Integer, Double>> tfidfValues = new ArrayList<>();
 		
 		double idfValue = findIdf(documents, corpus);
 		
@@ -53,8 +53,12 @@ public class TfIdfSorter {
 	   * @return the value of inverse document frequency
 	   */
 	private double findIdf(ArrayList<Integer> documents, ArrayList<ArrayList<String>> corpus){
-		double idf = Math.log(Double.valueOf(corpus.size()+1)/Double.valueOf(documents.size()+1)); //Adds 1 to both numerator and denominator to avoid division by zero and also get accurate results.
-		return idf;
+
+		//Adds 1 to both numerator and denominator to avoid division by zero and also get accurate results.
+		double corpusSize = corpus.size()+1;
+		double documentsWithWord = documents.size()+1;
+		
+		return Math.log(corpusSize / documentsWithWord);
 	}
 	
 	/**
