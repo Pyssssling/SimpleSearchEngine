@@ -5,6 +5,7 @@ import java.util.*;
 public class SimpleSearchEngine {
 
 	public static void main(String[] args) {
+		
 		SimpleSearchEngine search = new SimpleSearchEngine();
 		
 		ArrayList<String> results = search.runSearchEngine();
@@ -55,6 +56,7 @@ public class SimpleSearchEngine {
 	   * @return the corpus made of documents in the form of long strings
 	   */
 	private ArrayList<String> createCorpus(){
+		
 		ArrayList<String> originalCorpus = new ArrayList<>();
 		
 		originalCorpus.add("the brown fox jumped over the brown dog");
@@ -71,6 +73,7 @@ public class SimpleSearchEngine {
 	   * @return the corpus made of documents in the form of a list of strings
 	   */
 	private ArrayList<ArrayList<String>> convertCorpus(ArrayList<String> basicCorpus){
+		
 		ArrayList<ArrayList<String>> corpus = new ArrayList<>();
 		
 		for (String document : basicCorpus){
@@ -101,6 +104,7 @@ public class SimpleSearchEngine {
 	   * @return the index as a map with each word mapped to a list of all the documents that contain it
 	   */
 	private Map<String, ArrayList<Integer>> createIndex(ArrayList<ArrayList<String>> corpus){
+		
 		Map<String, ArrayList<Integer>> index = new HashMap<>();
 		
 		for(ArrayList<String> document:corpus){
@@ -108,7 +112,7 @@ public class SimpleSearchEngine {
 				if(!index.containsKey(word)){
 					index.put(word, new ArrayList<>(Arrays.asList(corpus.indexOf(document))));
 				} else{
-					index = addAdditionalIndex(index, word, corpus.indexOf(document));
+					addAdditionalIndex(index, word, corpus.indexOf(document));
 				}
 				
 			}
@@ -126,7 +130,8 @@ public class SimpleSearchEngine {
 	   * @param i the location of the document in the corpus in which the word can be found
 	   * @return the index with the word and location included
 	   */
-	private Map<String, ArrayList<Integer>> addAdditionalIndex(Map<String, ArrayList<Integer>> index, String word, int i){
+	private void addAdditionalIndex(Map<String, ArrayList<Integer>> index, String word, int i){
+		
 		ArrayList<Integer> tmpList = index.get(word);
 		
 		if(!tmpList.contains(i)){
@@ -135,7 +140,6 @@ public class SimpleSearchEngine {
 			index.put(word, tmpList);
 		}
 		
-		return index;
 	}
 
 	/**
